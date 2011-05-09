@@ -1,17 +1,23 @@
 #!/usr/bin/perl
 use MeCab;
 use Data::Dumper;
+use File::Basename;
 use TermExtract::MeCab;
 my %allwords;
 my %wordmatrix;
 my %filetitle;
 my $fileid=0;
+my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 
 open(ALL,">allwords.txt");
 while(@ARGV){
-  $file = shift @ARGV;
+  my $txt = "";
+  my $pos_str = "";
+  my $file = shift @ARGV;
+  my ($filename,$filepath,$filesuffix) = fileparse($file,$regex_suffix); 
   open(IN,"<$file");
-  open(OUT,">term_$file");
+  open(TRM,">$filename"."_term.txt");
+  open(POS,">$filename"."_pos.txt");
   $txt = do { local $/; <IN> };
   $filetitle{$fileid}=$file;
   #$mecab = MeCab::Tagger->new("-u /Users/shooter/Bin/MeCab/wikipedia.dic");
@@ -36,12 +42,14 @@ while(@ARGV){
     $pos_str .= join("\t",$word,$feature)."\n";
 
     if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾/) ){
-            print join("\t",$word,$feature),"\n";
+	    #print join("\t",$word,$feature),"\n";
             $allwords{$word}+=1;
 	    $wordmatrix{$word}{$fileid}+=1;
     }
     $node = $node->{next};
   }
+  #形態素解析結果出力
+  print POS $pos_str;
   #TermExtract 出力
     @noun_list = $data->get_imp_word($pos_str,'var');
     foreach (@noun_list) {
@@ -50,17 +58,17 @@ while(@ARGV){
        # 数値のみは表示しない
        next if $_->[0] =~ /^\d+$/;
        # 結果表示
-       printf OUT "%-60s %16.2f\n", $_->[0], $_->[1];
+       printf TRM "%-60s %16.2f\n", $_->[0], $_->[1];
     }
 }
     
-foreach $key (keys %allwords) {
+foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
   print ALL "$key\t$allwords{$key}\n";
 }
 
 foreach my $wordkey ( keys %wordmatrix ){
     foreach my $arrt_id ( keys %{$wordmatrix{$wordkey}} ){
-        print "$wordkey\t$arrt_id\t".$wordmatrix{$wordkey}->{$arrt_id} ."\n";
+	    #print "$wordkey\t$arrt_id\t".$wordmatrix{$wordkey}->{$arrt_id} ."\n";
     }
 }
 
