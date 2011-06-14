@@ -14,7 +14,6 @@ binmode OUT, ":utf8";        ##    <- こっちが正しい
 
 for(<IN>) {
   chomp($_);
-  print $_."\n";
 
   ## いらない単語をとばす
   next if $_ =~ /^\./;
@@ -34,6 +33,7 @@ for(<IN>) {
   next if $_ =~ /[\/\+!\?\-"'\$%&\(\*\)_,]+/;
   
   
+  print $_."\n";
   if (length($_) > 3) {
     print OUT "$_,0,0,".max(-36000,-400 * (length^1.5)).",名詞,固有名詞,*,*,*,*,$_,*,*,wikipedia_word,\n";
   }

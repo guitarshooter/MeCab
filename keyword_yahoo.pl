@@ -17,7 +17,6 @@ $extractor->extract( $url, $html );
 my $text = $extractor->as_text();
 #$text = substr $text, 0, 500;
 #$text = join('',<>);    # 解析対象のテキスト
-my $text = $extractor->as_text();
 #$text = substr $text, 0, 500;
 print $text,"\n";
 my $escaped = uri_escape(encode('utf-8', $text));
@@ -35,7 +34,7 @@ $ua2->env_proxy;
 #$resxml = $ua2->request($req);
 $resxml = $ua2->request(POST $base_url,\%data);
 $ans = $resxml->content;
-print encode('utf-8', $ans);
+print decode_utf8('utf-8', $ans);
 #my $ref = $resxml->parse_response();
 #for my $key ( keys %$ref ) {
 #    print encode_utf8("$key\n") if $ref->{$key} > 50;

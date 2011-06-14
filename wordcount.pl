@@ -11,6 +11,7 @@ my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 
 open(ALL,">allwords.txt");
 open(CNT,">arrt_words.txt");
+print CNT "単語";
 while(@ARGV){
   my $txt = "";
   my $pos_str = "";
@@ -21,6 +22,7 @@ while(@ARGV){
   open(POS,">$filename"."_pos.txt");
   $txt = do { local $/; <IN> };
   $filetitle{$fileid}=$file;
+  print CNT ","."$file";
   #$mecab = MeCab::Tagger->new("-u /Users/shooter/Bin/MeCab/wikipedia.dic");
   $mecab = MeCab::Tagger->new();
   $data = new TermExtract::MeCab;
@@ -35,7 +37,12 @@ while(@ARGV){
     #my $conjugation = $features[4] if ($features[4] ne '*'); # 活用
     #my $conjugate   = $features[5] if ($features[5] ne '*'); # 活用形
     #my $description = $features[6] if ($features[6] ne '*'); # 記述
-    #my $kana        = $features[7] if ($features[7] ne '*'); # 振り仮名
+#    print $word,$#features,"\n";
+    if ($features[7]){  #表記揺れ統一欄があれば置き換え
+      $nom_word  = $features[7];
+    }else{
+      $nom_word = $word;
+    }
     #my $pronunce    = $features[8] if ($features[8] ne '*'); # 発音
     #print join("\t", $word, $categories[0], $kana, $pronunce), "\n";
     
@@ -44,8 +51,8 @@ while(@ARGV){
 
     if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾/) ){
 	    #print join("\t",$word,$feature),"\n";
-            $allwords{$word}+=1;
-	    $wordmatrix{$word}{$fileid}+=1;
+            $allwords{$nom_word}+=1;
+	    $wordmatrix{$nom_word}{$fileid}+=1;
     }
     $node = $node->{next};
   }
@@ -65,17 +72,17 @@ while(@ARGV){
 }
     
 foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
-  print ALL "$key\t$allwords{$key}\n";
-  print CNT $key."\t";
+  print ALL "$key".","."$allwords{$key}\n";
+  print CNT "\n",$key;
     for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
       unless($wordmatrix{$key}->{$arrt_id}){
         $cnt = 0;
       }else{
         $cnt = $wordmatrix{$key}->{$arrt_id};
       }
-      print CNT $cnt."\t";
+      print CNT ",".$cnt;
     }
-    print CNT "\n";
+#    print CNT "\n";
 }
 
 #foreach my $wordkey ( keys %wordmatrix ){
