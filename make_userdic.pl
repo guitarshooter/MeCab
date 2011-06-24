@@ -18,7 +18,9 @@ binmode OUT, ":utf8";        ##    <- こっちが正しい
 
 for(<IN>) {
   chomp($_);
-  print OUT "$_,0,0,".max(-36000,-400 * (length^1.5)).",名詞,固有名詞,*,*,*,*,$_,*,*,$dicname,\n";
+  if (length($_) > 1) {
+    print OUT "$_,0,0,".max(-32768,(6000-200 * (length($_)^1.3))).",名詞,固有名詞,*,*,*,*,$_,*,*,$dicname,\n";
+  }
 }
 
 sub max {

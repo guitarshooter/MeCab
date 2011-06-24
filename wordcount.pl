@@ -38,11 +38,7 @@ while(@ARGV){
     #my $conjugate   = $features[5] if ($features[5] ne '*'); # 活用形
     #my $description = $features[6] if ($features[6] ne '*'); # 記述
 #    print $word,$#features,"\n";
-    if ($features[7]){  #表記揺れ統一欄があれば置き換え
-      $nom_word  = $features[7];
-    }else{
-      $nom_word = $word;
-    }
+    $nom_word = $word;
     #my $pronunce    = $features[8] if ($features[8] ne '*'); # 発音
     #print join("\t", $word, $categories[0], $kana, $pronunce), "\n";
     
