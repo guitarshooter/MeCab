@@ -3,6 +3,8 @@ use MeCab;
 use Data::Dumper;
 use File::Basename;
 use TermExtract::MeCab;
+use Unicode::Japanese;
+
 my %allwords;
 my %wordmatrix;
 my %filetitle;
@@ -38,7 +40,9 @@ while(@ARGV){
     #my $conjugate   = $features[5] if ($features[5] ne '*'); # 活用形
     #my $description = $features[6] if ($features[6] ne '*'); # 記述
 #    print $word,$#features,"\n";
-    $nom_word = $word;
+    $word =~ tr/a-z/A-Z/; #小文字→大文字変換
+    $nom_word = Unicode::Japanese->new($word)->h2z->get; #半角→全角に統一
+
     #my $pronunce    = $features[8] if ($features[8] ne '*'); # 発音
     #print join("\t", $word, $categories[0], $kana, $pronunce), "\n";
     
