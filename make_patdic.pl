@@ -2,19 +2,17 @@
 
 use strict;
 use warnings;
-use utf8;
-use encoding 'utf8';
+#use utf8;
+#use encoding 'utf8';
 use File::Basename;
 
 #if(@ARGV != 2){die "Usage:$0 filename DictionaryName";}
 my ($inputfile,$dicname) = @ARGV;
 my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 my ($filename,$filepath,$filesuffix) = fileparse($inputfile,$regex_suffix); 
-#my $outputfile = "$filename"."_patdic.csv";
 
 open(IN, "$inputfile");
-open(OUT, ">$outputfile");
-binmode OUT, ":utf8";        ##    <- こっちが正しい
+#binmode OUT, ":utf8";        ##    <- こっちが正しい
 
 for(<IN>) {
 #  chomp($_);
