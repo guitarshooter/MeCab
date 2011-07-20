@@ -4,34 +4,47 @@ use Data::Dumper;
 use File::Basename;
 use TermExtract::MeCab;
 use Unicode::Japanese;
-
-open(TECHTERM,">technicalterm.txt");
-
+#open(TECHTERM,">technicalterm.txt");
 my $DELLSTR = "DELLWORD"; #削除辞書区別フラグ
 
+my %term_score;
 
 while(<>){
   my $txt = "";
   my $pos_str = "";
-  $txt = $_;
+  my $score = 0;
+  $line = $_;
+  ($txt,$score) = split(/,/,$line);
+  $term_score{$wordlist[0]}+=$wordlist[1];
   $mecab = MeCab::Tagger->new();
   
   my $node_cnt = 0;
+  my $delflg = 0;
   $node = $mecab->parseToNode($txt);
   while ($node) {
-    $node_cnt++;
-    my $delflg = 0;
     my $word     = $node->{'surface'};
     my $feature  = $node->{'feature'};
     my @features = split(',', $feature);
     $word =~ tr/a-z/A-Z/; #小文字→大文字変換
     $nom_word = Unicode::Japanese->new($word)->h2z->get; #半角→全角に統一
-
-    if ($features[9] eq $DELLFLG){
-      $delflg = 1;
+    if ( $features[0] ne "BOS/EOS" ){
+      $node_cnt++;
+      if ($features[9] eq $DELLSTR){
+        $delflg = 1;
+      }
+	#    print $word,"\n";
+	#    print "NODECNT:".$node_cnt,"\n";
+	#    print $delflg,"\n";
+#     if (($node_cnt > 1 ) && ($delflg == 0 )){
+#        print $txt;
+#     }
     }
+    $node = $node->{next};
   }
-  if (($node_cnt > 1 ) && ($delflg = 0 )){
-    print $txt;
+  if (($node_cnt > 1 ) && ($delflg == 0 )){
+    $term_score{$txt}+=$score;
   }
+}
+foreach my $word (sort { $term_score{$b} <=> $term_score{$a} } keys %term_score){
+  print "$word,$term_score{$word}\n";
 }
