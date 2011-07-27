@@ -49,8 +49,8 @@ while(@ARGV){
     #print OUT join("\t",$word,$feature),"\n";
     $pos_str .= join("\t",$word,$feature)."\n";
 
-    if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞/) 
-    	&& ($feature[2] !~ m/助動詞語幹/)){
+    if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞|固有名詞/) 
+    	&& ($feature[2] !~ m/助動詞語幹/) && ($feature[9] !~ m/DELL/)){
 	    #print join("\t",$word,$feature),"\n";
             $allwords{$nom_word}+=1;
 	    $wordmatrix{$nom_word}{$fileid}+=1;
