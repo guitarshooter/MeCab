@@ -43,6 +43,7 @@ while(@ARGV){
 #    print $word,$#features,"\n";
     $word =~ tr/a-z/A-Z/; #小文字→大文字変換
     $nom_word = Unicode::Japanese->new($word)->h2z->get; #半角→全角に統一
+    $lower_word = Unicode::Japanese->new($word)->z2h->get; #半角→全角に統一
 
     #my $pronunce    = $features[8] if ($features[8] ne '*'); # 発音
     #print join("\t", $word, $categories[0], $kana, $pronunce), "\n";
@@ -51,7 +52,9 @@ while(@ARGV){
     $pos_str .= join("\t",$word,$feature)."\n";
 
     if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞|固有名詞|非自立/) 
-    	&& ($features[2] !~ m/助動詞語幹|副詞可能/) && ($features[9] ne $DELLSTR))
+       && ($features[2] !~ m/助動詞語幹|副詞可能/) && ($features[9] ne $DELLSTR)
+       && ($lower_word !~ m/[a-zA-Z]/) #アルファベット一文字
+    )
     {
 	    #print join("\t",$word,$feature),"\n";
             $allwords{$nom_word}+=1;
