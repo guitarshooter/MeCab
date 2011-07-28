@@ -10,6 +10,7 @@ my %wordmatrix;
 my %filetitle;
 my $fileid=0;
 my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
+my $DELLSTR="DELLWORD"; #削除辞書区別フラグ
 
 open(ALL,">allwords.txt");
 open(CNT,">arrt_words.txt");
@@ -49,8 +50,9 @@ while(@ARGV){
     #print OUT join("\t",$word,$feature),"\n";
     $pos_str .= join("\t",$word,$feature)."\n";
 
-    if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞|固有名詞/) 
-    	&& ($feature[2] !~ m/助動詞語幹/) && ($feature[9] !~ m/DELL/)){
+    if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞|固有名詞|非自立/) 
+    	&& ($features[2] !~ m/助動詞語幹|副詞可能/) && ($features[9] ne $DELLSTR))
+    {
 	    #print join("\t",$word,$feature),"\n";
             $allwords{$nom_word}+=1;
 	    $wordmatrix{$nom_word}{$fileid}+=1;
