@@ -24,7 +24,7 @@ while(@ARGV){
   open(TRM,">$filename"."_term.txt");
   open(POS,">$filename"."_pos.txt");
   $txt = do { local $/; <IN> };
-  $filetitle{$fileid}=$file;
+  $filetitle{$fileid}=$filename;
   print CNT ","."$file";
   #$mecab = MeCab::Tagger->new("-u /Users/shooter/Bin/MeCab/wikipedia.dic");
   $mecab = MeCab::Tagger->new();
@@ -89,16 +89,4 @@ foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
       }
       print CNT ",".$cnt;
     }
-#    print CNT "\n";
 }
-
-#foreach my $wordkey ( keys %wordmatrix ){
-##    foreach my $arrt_id ( sort { $wordmatrix{$wordkey}->{$a} <=>  $wordmatrix{$wordkey}->{$b} } keys %{$wordmatrix{$wordkey}} ){
-#	print $wordkey."\t";
-#	for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
-##	    print "$wordkey\t$arrt_id\t".$wordmatrix{$wordkey}->{$arrt_id} ."\n";
-#	    print $wordmatrix{$wordkey}->{$arrt_id} ."\t";
-#    }
-#    print "\n";
-#}
-
