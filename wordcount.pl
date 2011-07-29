@@ -7,6 +7,7 @@ use Unicode::Japanese;
 
 my %allwords;
 my %wordmatrix;
+my %filewordmatrix; #{file=>{word => count}}のハッシュ
 my %filetitle;
 my $fileid=0;
 my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
@@ -24,7 +25,7 @@ while(@ARGV){
   open(TRM,">$filename"."_term.txt");
   open(POS,">$filename"."_pos.txt");
   $txt = do { local $/; <IN> };
-  $filetitle{$fileid}=$file;
+  $filetitle{$fileid}=$filename;
   print CNT ","."$file";
   #$mecab = MeCab::Tagger->new("-u /Users/shooter/Bin/MeCab/wikipedia.dic");
   $mecab = MeCab::Tagger->new();
@@ -59,6 +60,7 @@ while(@ARGV){
 	    #print join("\t",$word,$feature),"\n";
             $allwords{$nom_word}+=1;
 	    $wordmatrix{$nom_word}{$fileid}+=1;
+	    $filewordmatrix{$fileid}{$nom_word}+=1;
     }
     $node = $node->{next};
   }
@@ -92,13 +94,11 @@ foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
 #    print CNT "\n";
 }
 
-#foreach my $wordkey ( keys %wordmatrix ){
-##    foreach my $arrt_id ( sort { $wordmatrix{$wordkey}->{$a} <=>  $wordmatrix{$wordkey}->{$b} } keys %{$wordmatrix{$wordkey}} ){
-#	print $wordkey."\t";
-#	for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
-##	    print "$wordkey\t$arrt_id\t".$wordmatrix{$wordkey}->{$arrt_id} ."\n";
-#	    print $wordmatrix{$wordkey}->{$arrt_id} ."\t";
-#    }
-#    print "\n";
-#}
 
+for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
+  print $filetitle{$arrt_id};
+  foreach $keyword (sort { $filewordmatrix{$arrt_id}{$a} <=> $filewordmatrix{$arrt_id}{$b} } keys %{$filewordmatrix{$arrt_id}}) {
+    print "\t".$keyword."\t".$filewordmatrix{$arrt_id}->{$keyword};
+  }
+  print "\n";
+}
