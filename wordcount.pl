@@ -7,6 +7,7 @@ use Unicode::Japanese;
 
 my %allwords;
 my %wordmatrix;
+my %filewordcnt;
 my %filetitle;
 my $fileid=0;
 my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
@@ -14,7 +15,9 @@ my $DELLSTR="DELLWORD"; #削除辞書区別フラグ
 
 open(ALL,">allwords.txt");
 open(CNT,">arrt_words.txt");
+open(TF,">arrt_words_tf.txt");
 print CNT "単語";
+print TF "単語";
 while(@ARGV){
   my $txt = "";
   my $pos_str = "";
@@ -25,7 +28,8 @@ while(@ARGV){
   open(POS,">$filename"."_pos.txt");
   $txt = do { local $/; <IN> };
   $filetitle{$fileid}=$filename;
-  print CNT ","."$file";
+  print CNT ","."$filename";
+  print TF ","."$filename";
   #$mecab = MeCab::Tagger->new("-u /Users/shooter/Bin/MeCab/wikipedia.dic");
   $mecab = MeCab::Tagger->new();
   $data = new TermExtract::MeCab;
@@ -59,6 +63,7 @@ while(@ARGV){
 	    #print join("\t",$word,$feature),"\n";
             $allwords{$nom_word}+=1;
 	    $wordmatrix{$nom_word}{$fileid}+=1;
+	    $filewordcnt{$fileid}+=1;
     }
     $node = $node->{next};
   }
@@ -79,14 +84,21 @@ while(@ARGV){
 }
     
 foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
-  print ALL "$key".","."$allwords{$key}\n";
+  my $doccnt=0;
+  print ALL "$key".","."$allwords{$key}";
   print CNT "\n",$key;
+  print TF "\n",$key;
     for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
       unless($wordmatrix{$key}->{$arrt_id}){
         $cnt = 0;
       }else{
         $cnt = $wordmatrix{$key}->{$arrt_id};
+        $tf = $cnt/$filewordcnt{$arrt_id};
+	$doccnt += 1;
       }
       print CNT ",".$cnt;
+      print TF ",".$tf;
     }
+    $idf = 1+log(($fileid+1)/$doccnt)/log(2);
+    print ALL ",".$idf."\n"; 
 }
