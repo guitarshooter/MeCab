@@ -57,7 +57,7 @@ while(@ARGV){
     #print OUT join("\t",$word,$feature),"\n";
     $pos_str .= join("\t",$word,$feature)."\n";
 
-    if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞|固有名詞|非自立/) 
+    if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞|固有名詞|非自立|サ変接続/) 
        && ($features[2] !~ m/助動詞語幹|副詞可能/) && ($features[9] ne $DELLSTR)
        && ($lower_word !~ m/[a-zA-Z]/) #アルファベット一文字
     )
