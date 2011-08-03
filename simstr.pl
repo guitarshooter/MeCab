@@ -11,9 +11,14 @@ binmode STDOUT, ":utf8";
 #my $key = shift;
 #my @seq1 = split(//, decode('utf-8', $key));
 my $file = shift;
+my @str = ();
 open (IN,$file);
-my @file = <IN>;
-my @str = grep (/^.{3,}/,@file);
+while(my $line = <IN>){
+  my @word = split(/,/,$line);
+  if($word[0] =~ /^.{3,}/ ){
+    push(@str,$word[0]);
+  }
+}
 #my @str = ("イメージ","ディスプレイ");
 foreach my $q1 (@str){
   my @seq1 = split(//, $q1);
