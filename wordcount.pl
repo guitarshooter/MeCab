@@ -85,6 +85,8 @@ while(@ARGV){
     }
     $fileid += 1;
 }
+
+print TF "頻度合計","IDF値";
     
 foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
   my $doccnt=0;
@@ -105,6 +107,8 @@ foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
     }
     $idf = 1+log(($fileid+1)/$doccnt)/log(2);
     print ALL ",".$idf."\n"; 
+    print TF ","."$allwords{$key}";
+    print TF ",".$idf;
 }
 
 for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
