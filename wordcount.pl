@@ -62,11 +62,11 @@ while(@ARGV){
        && ($lower_word !~ m/[a-zA-Z]/) #アルファベット一文字
     )
     {
-	    #print join("\t",$word,$feature),"\n";
+            #print join("\t",$word,$feature),"\n";
             $allwords{$nom_word}+=1;
-	    $wordmatrix{$nom_word}{$fileid}+=1;
-	    $filewordcnt{$fileid}+=1;
-	    #$filewordmatrix{$fileid}{$nom_word}+=1;
+            $wordmatrix{$nom_word}{$fileid}+=1;
+            $filewordcnt{$fileid}+=1;
+            #$filewordmatrix{$fileid}{$nom_word}+=1;
     }
     $node = $node->{next};
   }
@@ -99,8 +99,8 @@ foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
       }else{
         $cnt = $wordmatrix{$key}->{$arrt_id};
         $tf = $cnt/$filewordcnt{$arrt_id};
-	$filewordmatrix{$arrt_id}{$key}=$tf;
-	$doccnt += 1;
+        $filewordmatrix{$arrt_id}{$key}=$tf;
+        $doccnt += 1;
       }
       print CNT ",".$cnt;
       print TF ",".$tf;
