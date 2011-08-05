@@ -57,16 +57,16 @@ while(@ARGV){
     #print OUT join("\t",$word,$feature),"\n";
     $pos_str .= join("\t",$word,$feature)."\n";
 
-    if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞|固有名詞|非自立/) 
-       && ($features[2] !~ m/助動詞語幹|副詞可能/) && ($features[9] ne $DELLSTR)
+    if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞|固有名詞|非自立|サ変接続|副詞可能|形容動詞語幹/) 
+       && ($features[2] !~ m/助動詞語幹|助数詞/) && ($features[9] ne $DELLSTR)
        && ($lower_word !~ m/[a-zA-Z]/) #アルファベット一文字
     )
     {
-	    #print join("\t",$word,$feature),"\n";
+            #print join("\t",$word,$feature),"\n";
             $allwords{$nom_word}+=1;
-	    $wordmatrix{$nom_word}{$fileid}+=1;
-	    $filewordcnt{$fileid}+=1;
-	    #$filewordmatrix{$fileid}{$nom_word}+=1;
+            $wordmatrix{$nom_word}{$fileid}+=1;
+            $filewordcnt{$fileid}+=1;
+            #$filewordmatrix{$fileid}{$nom_word}+=1;
     }
     $node = $node->{next};
   }
@@ -85,6 +85,8 @@ while(@ARGV){
     }
     $fileid += 1;
 }
+
+print TF ","."頻度合計",","."IDF値";
     
 foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
   my $doccnt=0;
@@ -92,20 +94,22 @@ foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
   print CNT "\n",$key;
   print TF "\n",$key;
     for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
-      unless($wordmatrix{$key}->{$arrt_id}){
-        $cnt = 0;
-      }else{
+      my $cnt = 0;
+      if(exists($wordmatrix{$key}->{$arrt_id})){
         $cnt = $wordmatrix{$key}->{$arrt_id};
-        $tf = $cnt/$filewordcnt{$arrt_id};
-	$filewordmatrix{$arrt_id}{$key}=$tf;
-	$doccnt += 1;
+        $doccnt += 1;
       }
+      $tf = $cnt/$filewordcnt{$arrt_id};
+      $filewordmatrix{$arrt_id}{$key}=$tf;
       print CNT ",".$cnt;
       print TF ",".$tf;
     }
     $idf = 1+log(($fileid+1)/$doccnt)/log(2);
     print ALL ",".$idf."\n"; 
+    print TF ","."$allwords{$key}";
+    print TF ",".$idf;
 }
+
 
 for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
   print CLUST $filetitle{$arrt_id};
