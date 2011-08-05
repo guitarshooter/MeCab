@@ -7,6 +7,8 @@ use Unicode::Japanese;
 
 my %allwords;
 my %wordmatrix;
+my %filewordcnt;
+my %filewordmatrix; #{file=>{word => count}}のハッシュ
 my %filetitle;
 my $fileid=0;
 my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
@@ -14,7 +16,10 @@ my $DELLSTR="DELLWORD"; #削除辞書区別フラグ
 
 open(ALL,">allwords.txt");
 open(CNT,">arrt_words.txt");
+open(TF,">arrt_words_tf.txt");
+open(CLUST,">arrt_words_clust.txt");
 print CNT "単語";
+print TF "単語";
 while(@ARGV){
   my $txt = "";
   my $pos_str = "";
@@ -24,8 +29,9 @@ while(@ARGV){
   open(TRM,">$filename"."_term.txt");
   open(POS,">$filename"."_pos.txt");
   $txt = do { local $/; <IN> };
-  $filetitle{$fileid}=$file;
-  print CNT ","."$file";
+  $filetitle{$fileid}=$filename;
+  print CNT ","."$filename";
+  print TF ","."$filename";
   #$mecab = MeCab::Tagger->new("-u /Users/shooter/Bin/MeCab/wikipedia.dic");
   $mecab = MeCab::Tagger->new();
   $data = new TermExtract::MeCab;
@@ -51,14 +57,16 @@ while(@ARGV){
     #print OUT join("\t",$word,$feature),"\n";
     $pos_str .= join("\t",$word,$feature)."\n";
 
-    if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞|固有名詞|非自立/) 
-       && ($features[2] !~ m/助動詞語幹|副詞可能/) && ($features[9] ne $DELLSTR)
+    if (($features[0] eq '名詞') && ($features[1] !~ m/数|接尾|代名詞|固有名詞|非自立|サ変接続|副詞可能|形容動詞語幹/) 
+       && ($features[2] !~ m/助動詞語幹|助数詞/) && ($features[9] ne $DELLSTR)
        && ($lower_word !~ m/[a-zA-Z]/) #アルファベット一文字
     )
     {
-	    #print join("\t",$word,$feature),"\n";
+            #print join("\t",$word,$feature),"\n";
             $allwords{$nom_word}+=1;
-	    $wordmatrix{$nom_word}{$fileid}+=1;
+            $wordmatrix{$nom_word}{$fileid}+=1;
+            $filewordcnt{$fileid}+=1;
+            #$filewordmatrix{$fileid}{$nom_word}+=1;
     }
     $node = $node->{next};
   }
@@ -77,28 +85,36 @@ while(@ARGV){
     }
     $fileid += 1;
 }
+
+print TF ","."頻度合計",","."IDF値";
     
 foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
-  print ALL "$key".","."$allwords{$key}\n";
+  my $doccnt=0;
+  print ALL "$key".","."$allwords{$key}";
   print CNT "\n",$key;
+  print TF "\n",$key;
     for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
-      unless($wordmatrix{$key}->{$arrt_id}){
-        $cnt = 0;
-      }else{
+      my $cnt = 0;
+      if(exists($wordmatrix{$key}->{$arrt_id})){
         $cnt = $wordmatrix{$key}->{$arrt_id};
+        $doccnt += 1;
       }
+      $tf = $cnt/$filewordcnt{$arrt_id};
+      $filewordmatrix{$arrt_id}{$key}=$tf;
       print CNT ",".$cnt;
+      print TF ",".$tf;
     }
-#    print CNT "\n";
+    $idf = 1+log(($fileid+1)/$doccnt)/log(2);
+    print ALL ",".$idf."\n"; 
+    print TF ","."$allwords{$key}";
+    print TF ",".$idf;
 }
 
-#foreach my $wordkey ( keys %wordmatrix ){
-##    foreach my $arrt_id ( sort { $wordmatrix{$wordkey}->{$a} <=>  $wordmatrix{$wordkey}->{$b} } keys %{$wordmatrix{$wordkey}} ){
-#	print $wordkey."\t";
-#	for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
-##	    print "$wordkey\t$arrt_id\t".$wordmatrix{$wordkey}->{$arrt_id} ."\n";
-#	    print $wordmatrix{$wordkey}->{$arrt_id} ."\t";
-#    }
-#    print "\n";
-#}
 
+for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
+  print CLUST $filetitle{$arrt_id};
+  foreach $keyword (sort { $filewordmatrix{$arrt_id}{$a} <=> $filewordmatrix{$arrt_id}{$b} } keys %{$filewordmatrix{$arrt_id}}) {
+    print CLUST "\t".$keyword."\t".$filewordmatrix{$arrt_id}->{$keyword};
+  }
+  print CLUST "\n";
+}
