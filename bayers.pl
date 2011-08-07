@@ -17,7 +17,7 @@ my $file  = $opt_f;
 my $label = $opt_l;
 
 if (!defined($file)) { 
-  die "usage: need -f filename\n";
+  die "usage: -c [predict|train] -f filename -l label\n";
 }
 $bayes = &loadInstance;
 if ($command eq 'predict') {
@@ -59,11 +59,28 @@ sub calcPredict {
 sub trainInstance {
   my $file  = $_[0];
   my $label = $_[1];
-  my %list = &getHash($file);
-  $bayes->add_instance(
-    attributes => {%list},
-    label => $label,
-  );
+  #my %list = &getHash($file);
+  open INFILE, "< $file" or die "Cannot open file: $file";
+
+  while (<INFILE>) {
+    chomp();
+    my %hash=();
+    my @line = split(/\t/,$_);
+    my $linecnt = @line;
+    my ($word,$i,$cnt);
+    for($i=1;$i<$linecnt;){
+      if($i % 2 == 1){
+        $word = $line[$i];
+        $cnt = $line[$i+1];
+        $hash{$word} = $cnt;
+      }
+      $i=$i+2;
+    }
+    $bayes->add_instance(
+      attributes => {%hash},
+      label => $label,
+      );
+  }
   $bayes->train;
   Storable::store($bayes => $DB );
 }
@@ -100,4 +117,4 @@ sub getHash {
 }
   eval {$bayes = Storable::retrieve($DB)} if -e $DB;
   $bayes ||= Algorithm::NaiveBayes->new(purge => 0);
-  print Dumper($bayes);
+  #print Dumper($bayes);

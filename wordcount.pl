@@ -100,7 +100,8 @@ foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
         $doccnt += 1;
       }
       $tf = $cnt/$filewordcnt{$arrt_id};
-      $filewordmatrix{$arrt_id}{$key}=$tf;
+      #$filewordmatrix{$arrt_id}{$key}=$tf;
+      $filewordmatrix{$arrt_id}{$key}=$cnt;
       print CNT ",".$cnt;
       print TF ",".$tf;
     }
