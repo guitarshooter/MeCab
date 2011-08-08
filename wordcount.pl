@@ -87,6 +87,7 @@ while(@ARGV){
 }
 
 print TF ","."頻度合計",","."IDF値";
+print CNT ","."頻度合計",","."IDF値";
     
 foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
   my $doccnt=0;
@@ -111,10 +112,10 @@ foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
 }
 
 
-for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
-  print CLUST $filetitle{$arrt_id};
-  foreach $keyword (sort { $filewordmatrix{$arrt_id}{$a} <=> $filewordmatrix{$arrt_id}{$b} } keys %{$filewordmatrix{$arrt_id}}) {
-    print CLUST "\t".$keyword."\t".$filewordmatrix{$arrt_id}->{$keyword};
-  }
-  print CLUST "\n";
-}
+#for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
+#  print CLUST $filetitle{$arrt_id};
+#  foreach $keyword (sort { $filewordmatrix{$arrt_id}{$a} <=> $filewordmatrix{$arrt_id}{$b} } keys %{$filewordmatrix{$arrt_id}}) {
+#    print CLUST "\t".$keyword."\t".$filewordmatrix{$arrt_id}->{$keyword};
+#  }
+#  print CLUST "\n";
+#}
