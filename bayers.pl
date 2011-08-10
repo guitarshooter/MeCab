@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
 use Algorithm::NaiveBayes;
@@ -17,14 +17,16 @@ my $file  = $opt_f;
 my $label = $opt_l;
 
 if (!defined($file)) { 
-  die "usage: -c [predict|train] -f filename -l label\n";
+  die "usage: -c [predict|train] -f filename [-l list]\n";
 }
 $bayes = &loadInstance;
 if ($command eq 'predict') {
   &calcPredict($file);
 } elsif ($command eq 'train') {
-  if (!defined($label)) {die "need -l labelname\n"};
+  if (!defined($label)) {die "need -l labelfilename\n"};
   &trainInstance($file,$label);
+}else{
+  die "usage: -c [predict|train] -f filename [-l list]\n";
 }
 
 
@@ -59,8 +61,17 @@ sub calcPredict {
 sub trainInstance {
   my $file  = $_[0];
   my $label = $_[1];
+  my %pat_genre;
+  my @l;
   #my %list = &getHash($file);
   open INFILE, "< $file" or die "Cannot open file: $file";
+  open LABEL, "< $label" or die "Cannot open file: $label";
+
+  while (<LABEL>){
+    chomp();
+    @l = split(/,/,$_);
+    $pat_genre{$l[0]}=$l[1];
+  }
 
   while (<INFILE>) {
     chomp();
@@ -68,6 +79,8 @@ sub trainInstance {
     my @line = split(/\t/,$_);
     my $linecnt = @line;
     my ($word,$i,$cnt);
+    my $filetitle = $line[0];
+    $filetitle =~ s/_dat//g; #ファイル名が特許番号_dat.txtなので揃える
     for($i=1;$i<$linecnt;){
       if($i % 2 == 1){
         $word = $line[$i];
@@ -76,9 +89,11 @@ sub trainInstance {
       }
       $i=$i+2;
     }
+    print $filetitle." reading... ".$pat_genre{$filetitle}.".\n";
+
     $bayes->add_instance(
       attributes => {%hash},
-      label => $label,
+      label => $pat_genre{$filetitle},
       );
   }
   $bayes->train;
