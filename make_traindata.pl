@@ -9,7 +9,11 @@ my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 my $DELLSTR="DELLWORD"; #削除辞書区別フラグ
 
 open(OUT,">title_words.txt");
+my $argcnt = $#ARGV + 1;
+print $argcnt." file..."."\n";
 while(@ARGV){
+  $argcnt = @ARGV;
+  if($argcnt % 10 == 0){print $argcnt." file remains..."."\n"};
   my $txt = "";
   my $pos_str = "";
   my %wordcount = ();
