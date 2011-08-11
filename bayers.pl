@@ -39,7 +39,7 @@ sub calcPredict {
     my $linecnt = @line;
     my %list;
     my $title = $line[0];
-    print $title,"\n";
+    print $title,"\t";
     my ($i,$word,$cnt);
     for($i=1;$i<$linecnt;){
       my $linecnt = @line;
@@ -54,7 +54,11 @@ sub calcPredict {
     my $result = $bayes->predict(
       attributes => {%list}
     );
-    print Dumper($result);
+    #print Dumper($result);
+    foreach my $gen (sort { $$result{$b} <=> $$result{$a} } keys %$result){
+      print $gen."\t",$$result{$gen}."\t";
+    }
+    print "\n";
   }
 }
   

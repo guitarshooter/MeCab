@@ -8,7 +8,9 @@ use Unicode::Japanese;
 my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 my $DELLSTR="DELLWORD"; #削除辞書区別フラグ
 
-open(OUT,">title_words.txt");
+my $trainfile = shift @ARGV;
+
+open(OUT,">$trainfile");
 my $argcnt = $#ARGV + 1;
 print $argcnt." file..."."\n";
 while(@ARGV){
@@ -20,8 +22,8 @@ while(@ARGV){
   my $file = shift @ARGV;
   my ($filename,$filepath,$filesuffix) = fileparse($file,$regex_suffix); 
   open(IN,"<$file");
-  open(TRM,">$filename"."_term.txt");
-  open(POS,">$filename"."_pos.txt");
+#  open(TRM,">$filename"."_term.txt");
+#  open(POS,">$filename"."_pos.txt");
   $txt = do { local $/; <IN> };
   print OUT "$filename";
   $mecab = MeCab::Tagger->new();
@@ -53,17 +55,17 @@ while(@ARGV){
   print OUT "\n";
   
   #形態素解析結果出力
-  print POS $pos_str;
+  #print POS $pos_str;
   #TermExtract 出力
-    @noun_list = $data->get_imp_word($pos_str,'var');
-    foreach (@noun_list) {
-       # 日付・時刻は表示しない
-       next if $_->[0] =~ /^(昭和)*(平成)*(\d+年)*(\d+月)*(\d+日)*(午前)*(午後)*(\d+時)*(\d+分)*(\d+秒)*$/;
-       # 数値のみは表示しない
-       next if $_->[0] =~ /^\d+$/;
-       # 結果表示
-#       printf TRM "%-60s %16.2f\n", $_->[0], $_->[1];
-       printf TRM "%-s,%.2f\n",$_->[0],$_->[1];
-    }
+  #  @noun_list = $data->get_imp_word($pos_str,'var');
+  #  foreach (@noun_list) {
+  #     # 日付・時刻は表示しない
+  #     next if $_->[0] =~ /^(昭和)*(平成)*(\d+年)*(\d+月)*(\d+日)*(午前)*(午後)*(\d+時)*(\d+分)*(\d+秒)*$/;
+  #     # 数値のみは表示しない
+  #     next if $_->[0] =~ /^\d+$/;
+  #     # 結果表示
+# #      printf TRM "%-60s %16.2f\n", $_->[0], $_->[1];
+  #     printf TRM "%-s,%.2f\n",$_->[0],$_->[1];
+  #  }
 }
 

@@ -55,8 +55,12 @@ while(@files){
       $filename =~ s/９/9/g;
       $filename =~ s/－/\-/g;      
       #$filename =~ s/\x{2212}/\x{FF0D}/g;
+      if($filename =~ m/.+-.+/){
+        my @f = split(/-/,$filename);
+        $filename = $f[0]."-".sprintf("%06d",$f[1]);
+      }
       $filename = $filename.".txt";
-      #      print $filename,"\n";
+      print $filename,"\n";
 #      print Encode::from_to($filename, "shiftjis","utf8" );
     }
     $html .= $_;
