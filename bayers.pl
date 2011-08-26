@@ -17,16 +17,14 @@ my $file  = $opt_f;
 my $label = $opt_l;
 
 if (!defined($file)) { 
-  die "usage: -c [predict|train] -f filename [-l list]\n";
+  die "usage: -c [predict|train] -f filename -l label\n";
 }
 $bayes = &loadInstance;
 if ($command eq 'predict') {
   &calcPredict($file);
 } elsif ($command eq 'train') {
-  if (!defined($label)) {die "need -l labelfilename\n"};
+  if (!defined($label)) {die "need -l labelname\n"};
   &trainInstance($file,$label);
-}else{
-  die "usage: -c [predict|train] -f filename [-l list]\n";
 }
 
 
@@ -39,7 +37,8 @@ sub calcPredict {
     my $linecnt = @line;
     my %list;
     my $title = $line[0];
-    print $title,"\t";
+    $title =~ s/_dat//g;
+    print $title;
     my ($i,$word,$cnt);
     for($i=1;$i<$linecnt;){
       my $linecnt = @line;
@@ -54,27 +53,28 @@ sub calcPredict {
     my $result = $bayes->predict(
       attributes => {%list}
     );
-    #print Dumper($result);
-    foreach my $gen (sort { $$result{$b} <=> $$result{$a} } keys %$result){
-      print $gen."\t",$$result{$gen}."\t";
+    foreach my $key (sort {$$result{$b} <=> $$result{$a}} keys %$result){
+      print ",".$key.",".$$result{$key};
     }
     print "\n";
+    #print Dumper($result);
   }
 }
   
 sub trainInstance {
   my $file  = $_[0];
-  my $label = $_[1];
-  my %pat_genre;
-  my @l;
+  my $labelfile = $_[1];
+  my %labelhush;
   #my %list = &getHash($file);
   open INFILE, "< $file" or die "Cannot open file: $file";
-  open LABEL, "< $label" or die "Cannot open file: $label";
+  open INLABEL, "< $labelfile" or die "Cannot open file: $file";
 
-  while (<LABEL>){
+  while (<INLABEL>) {
     chomp();
-    @l = split(/,/,$_);
-    $pat_genre{$l[0]}=$l[1];
+    my ($docname,$labelname)=split(/,/,$_);
+    $docname =~ s/_dat//g;
+    $labelhush{$docname}=$labelname;
+    #print $docname,$labelhush{$docname};
   }
 
   while (<INFILE>) {
@@ -83,22 +83,25 @@ sub trainInstance {
     my @line = split(/\t/,$_);
     my $linecnt = @line;
     my ($word,$i,$cnt);
-    my $filetitle = $line[0];
-    $filetitle =~ s/_dat//g; #ファイル名が特許番号_dat.txtなので揃える
-    for($i=1;$i<$linecnt;){
-      if($i % 2 == 1){
-        $word = $line[$i];
-        $cnt = $line[$i+1];
-        $hash{$word} = $cnt;
+    my $doc = $line[0];
+    $doc =~ s/_dat//g;
+    if($labelhush{$doc}){ #ラベルがないものはスキップ
+      for($i=1;$i<$linecnt;){
+        if($i % 2 == 1){
+          $word = $line[$i];
+          $cnt = $line[$i+1];
+          $hash{$word} = $cnt;
+        }
+        $i=$i+2;
       }
-      $i=$i+2;
-    }
-    print $filetitle." reading... ".$pat_genre{$filetitle}.".\n";
-
-    $bayes->add_instance(
-      attributes => {%hash},
-      label => $pat_genre{$filetitle},
+      $bayes->add_instance(
+        attributes => {%hash},
+        label => $labelhush{$doc},
       );
+      print "$doc".":".$labelhush{$doc}." reading..."."\n";
+    }else{
+      print "$doc".": No Label. skip..."."\n";
+    }
   }
   $bayes->train;
   Storable::store($bayes => $DB );
