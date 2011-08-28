@@ -15,9 +15,9 @@ my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 my $DELLSTR="DELLWORD"; #削除辞書区別フラグ
 
 open(ALL,">allwords.txt");
-open(CNT,">arrt_words.txt");
+open(CNT,">arrt_words_cnt.txt");
 open(TF,">arrt_words_tf.txt");
-open(CLUST,">arrt_words_clust.txt");
+#open(CLUST,">arrt_words_clust.txt");
 print CNT "単語";
 print TF "単語";
 while(@ARGV){
@@ -87,6 +87,7 @@ while(@ARGV){
 }
 
 print TF ","."頻度合計",","."IDF値";
+print CNT ","."頻度合計",","."IDF値";
     
 foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
   my $doccnt=0;
@@ -107,15 +108,17 @@ foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
     }
     $idf = 1+log(($fileid+1)/$doccnt)/log(2);
     print ALL ",".$idf."\n"; 
+    print CNT ","."$allwords{$key}";
+    print CNT ",".$idf;
     print TF ","."$allwords{$key}";
     print TF ",".$idf;
 }
 
 
-for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
-  print CLUST $filetitle{$arrt_id};
-  foreach $keyword (sort { $filewordmatrix{$arrt_id}{$a} <=> $filewordmatrix{$arrt_id}{$b} } keys %{$filewordmatrix{$arrt_id}}) {
-    print CLUST "\t".$keyword."\t".$filewordmatrix{$arrt_id}->{$keyword};
-  }
-  print CLUST "\n";
-}
+#for($arrt_id=0;$arrt_id<$fileid;$arrt_id++){
+#  print CLUST $filetitle{$arrt_id};
+#  foreach $keyword (sort { $filewordmatrix{$arrt_id}{$a} <=> $filewordmatrix{$arrt_id}{$b} } keys %{$filewordmatrix{$arrt_id}}) {
+#    print CLUST "\t".$keyword."\t".$filewordmatrix{$arrt_id}->{$keyword};
+#  }
+#  print CLUST "\n";
+#}
