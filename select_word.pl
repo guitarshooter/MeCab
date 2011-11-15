@@ -15,7 +15,7 @@ my @arrt_file = ("arrt_words_cnt.txt","arrt_words_tf.txt");
 
 my $MAXIDF;
 my $MINIDF = 2;  #使用する単語のIDF最小値。
-my $MINCNT = 10; #使用する単語の最小頻度。
+my $MINCNT = 30; #使用する単語の最小頻度。
 
 while(@arrt_file){
   my $file = shift @arrt_file;
@@ -26,17 +26,18 @@ while(@arrt_file){
 
   my @fileline = <FH>;
 
-  print SELECT $fileline[0];
+#  print SELECT $fileline[0];
 
   my $headerline = shift(@fileline); #１行目はヘッダなので削除
   my $linecnt = @fileline; #ファイルの行数＝単語数-1
   my @header = split(/,/,$headerline);
   #左端はヘッダ、右２つは頻度とIDF値なのでカット
   my @filetitle = @header[1..$#header-2]; 
+  print SELECT join(",",@filetitle),"\n";
 
   my $alldoccnt = @header;
   $alldoccnt = $alldoccnt - 2; #ドキュメント数＝カラム数-2（全頻度,IDF値）
-  $MAXIDF = 1+log($alldoccnt)/log(2); #使用する単語のIDF最大値。
+  $MAXIDF = 1+log($alldoccnt*0.8)/log(2); #使用する単語のIDF最大値。
 
   my $i;
   for($i=0;$i<$linecnt;$i++){
@@ -49,7 +50,7 @@ while(@arrt_file){
     #IDF値が一定の重みより大きく、かつ、大きすぎず、頻度は一定以上の単語
     if($idf < $MAXIDF && $idf >= $MINIDF && $cnt >= $MINCNT){
       #使用単語×文書リスト
-      print SELECT join(",",$word,@filelist,$cnt,$idf),"\n"; 
+      print SELECT join(",",$word,@filelist),"\n"; 
       #クラスタ作成用ファイル 文書,key1,value1,key2,value2...
       my $j=0;
       for($j=0;$j<$alldoccnt;$j++){
