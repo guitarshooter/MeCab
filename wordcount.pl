@@ -94,7 +94,6 @@ while(@ARGV){
 print TF ","."頻度合計",","."IDF値";
 print CNT ","."頻度合計",","."IDF値";
 
-#print Dumper(\%filewordcnt);
     
 foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
   my $doccnt=0;
@@ -107,7 +106,11 @@ foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
         $cnt = $wordmatrix{$key}->{$arrt_id};
         $doccnt += 1;
       }
-      $tf = $cnt/$filewordcnt{$arrt_id};
+      if($filewordcnt{$arrt_id}){
+        $tf = $cnt/$filewordcnt{$arrt_id};
+      }else{
+        $tf = 0;
+      }
       #$filewordmatrix{$arrt_id}{$key}=$tf;
       $filewordmatrix{$arrt_id}{$key}=$cnt;
       print CNT ",".$cnt;
