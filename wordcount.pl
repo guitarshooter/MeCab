@@ -24,11 +24,16 @@ while(@ARGV){
   my $txt = "";
   my $pos_str = "";
   my $file = shift @ARGV;
+  print $file."...\n";
   my ($filename,$filepath,$filesuffix) = fileparse($file,$regex_suffix); 
   open(IN,"<$file");
   open(TRM,">$filename"."_term.txt");
   open(POS,">$filename"."_pos.txt");
   $txt = do { local $/; <IN> };
+  unless($txt){
+    print "Notice:".$filename." is none...\n";
+    next;
+  }
   $filetitle{$fileid}=$filename;
   print CNT ","."$filename";
   print TF ","."$filename";
@@ -88,6 +93,8 @@ while(@ARGV){
 
 print TF ","."頻度合計",","."IDF値";
 print CNT ","."頻度合計",","."IDF値";
+
+#print Dumper(\%filewordcnt);
     
 foreach $key (sort { $allwords{$b} <=> $allwords{$a} } keys %allwords) {
   my $doccnt=0;
