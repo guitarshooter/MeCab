@@ -13,12 +13,13 @@ my $DELLSTR="DELLWORD"; #削除辞書区別フラグ
 while(@ARGV){
   my $txt = "";
   my $pos_str = "";
+  my $pos_str_term = "";
   my $file = shift @ARGV;
   print $file."...\n";
   my ($filename,$filepath,$filesuffix) = fileparse($file,$regex_suffix); 
   open(IN,"<$file");
-  open(TRM,">$filename"."_term.txt");
-  open(POS,">$filename"."_pos.txt");
+  open(TRM,">$filename".".term");
+  open(POS,">$filename".".pos");
   $txt = do { local $/; <IN> };
   unless($txt){
     print "Notice:".$filename." is none...\n";
@@ -50,12 +51,13 @@ while(@ARGV){
     
     #print OUT join("\t",$word,$feature),"\n";
     $pos_str .= join(",",$word,$feature)."\n";
+    $pos_str_term .= join("\t",$word,$feature)."\n";
     $node = $node->{next};
   }
   #形態素解析結果出力
   print POS $pos_str;
   #TermExtract 出力
-    @noun_list = $data->get_imp_word($pos_str,'var');
+    @noun_list = $data->get_imp_word($pos_str_term,'var');
     foreach (@noun_list) {
        # 日付・時刻は表示しない
        next if $_->[0] =~ /^(昭和)*(平成)*(\d+年)*(\d+月)*(\d+日)*(午前)*(午後)*(\d+時)*(\d+分)*(\d+秒)*$/;
