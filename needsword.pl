@@ -15,17 +15,31 @@ while(@ARGV){
   my $flg = 0;
   my $needs_str = "";
   open(IN,"<$file");
-  @data = <IN>;
+  @pat_data = <IN>;
   #BOS/EOSを取り除く
-  if($data[0] =~ /BOS\/EOS/){
-    shift(@data);
+  if($pat_data[0] =~ /BOS\/EOS/){
+    shift(@pat_data);
   }
-  if($data[$#data] =~ /BOS\/EOS/){
-    pop(@data);
+  if($pat_data[$#pat_data] =~ /BOS\/EOS/){
+    pop(@pat_data);
   }
 
+  $needs_str = needsword_search(@pat_data);
+
+  if($needs_str){
+    print $file.":".$needs_str,"\n";
+  }else{
+    #注目ワードが無かった場合
+  }
+
+}
+
+sub needsword_search{
+  my @data = @_;
+  my $needs_str = "";
+  $flg = 0;
   #ニーズワード抽出部。逆から遡る
-  for($i=$#data;0<=$i;$i--){
+  for(my $i=$#data;0<=$i;$i--){
     #フラグが立っていれば、名詞一般まですべての単語を取得
     if($flg == 1){
       #名詞一般でない場合は取得
@@ -74,5 +88,5 @@ while(@ARGV){
       }
     }
   }
-  print $file.":".$needs_str,"\n";
+  return $needs_str;
 }
