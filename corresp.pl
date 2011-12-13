@@ -19,6 +19,27 @@ my $Rscript = "corresp_tmp.R"; #コレスポンデンス分析用Rスクリプ�
 my $inputData = $wd."/".$ARGV[0]; #入力ファイル名（文書×単語（TF値）ファイル）
 #my ($filename,$filepath,$filesuffix) = fileparse($file,$regex_suffix); 
 
+open(IN,"<$inputData");
+open(OUT,">$wd/corresp_calc.csv");
+while($line = <IN>){
+  if($line =~ /^"/){
+    $line =~ /^"(.+)"(.+)/;
+    #print "111".$1,"\n";
+    #print "222".$2,"\n";
+    $comma = $1;
+    $nocomma = $1;
+    $data = $2;
+    #print "----".$comma,"\n";
+    $nocomma =~ s/,/、/g;
+    #print "-------".$nocomma,"\n";
+    #$line = s/"$comma"/"$nocomma"/g;
+    $line = $nocomma.$data."\n";
+    print OUT $line;
+  }else{
+    print OUT $line;
+  }
+}
+
 if( -f $inputData){
   print "$inputData"." exist.\n";
 }else{
@@ -37,7 +58,9 @@ open(FH,">$Rscript");
 
 my $Rbat = <<"EOS";
 library(MASS)
-x<-read.csv("$inputData",header=TRUE,row.names=1)
+y<-read.csv("$wd/corresp_calc.csv",header=TRUE,row.names=1)
+z <- y[rowSums(y) != 0, ]
+x <- z[,colSums(z) != 0 ]
 x.ca<-corresp(x,nf=3)
 write.table(x.ca\$cscore,"./${output}_col.csv",sep=",",quote=F,col.names=F)
 write.table(x.ca\$rscore,"./${output}_row.csv",sep=",",quote=F,col.names=F)
