@@ -2,10 +2,11 @@
 use FindBin;
 use File::Basename;
 use Cwd;
+use Encode;
 
 my $cnt = @ARGV;
 
-if($cnt < 1){
+if($cnt < 1 && $cnt > 2){
   die("Usage:$0 inputfile [outputfile]"); #出力ファイル名は省略可能
 }
 
@@ -22,6 +23,7 @@ my $inputData = $wd."/".$ARGV[0]; #入力ファイル名（文書×単語（TF�
 open(IN,"<$inputData");
 open(OUT,">$wd/corresp_calc.csv");
 while($line = <IN>){
+    Encode::from_to($line,"cp932","utf8");
   if($line =~ /^"/){
     $line =~ /^"(.+)"(.+)/;
     #print "111".$1,"\n";
