@@ -36,10 +36,8 @@ while($line = <IN>){
     #print "-------".$nocomma,"\n";
     #$line = s/"$comma"/"$nocomma"/g;
     $line = $nocomma.$data."\n";
-    print OUT $line;
-  }else{
-    print OUT $line;
   }
+  print OUT $line;
 }
 
 if( -f $inputData){
@@ -64,8 +62,8 @@ y<-read.csv("$wd/corresp_calc.csv",header=TRUE,row.names=1)
 z <- y[rowSums(y) != 0, ]
 x <- z[,colSums(z) != 0 ]
 x.ca<-corresp(x,nf=3)
-write.table(x.ca\$cscore,"./${output}_col.csv",sep=",",quote=F,col.names=F)
-write.table(x.ca\$rscore,"./${output}_row.csv",sep=",",quote=F,col.names=F)
+write.table(x.ca\$cscore,"./${output}_col.csv",sep=",",col.names=F)
+write.table(x.ca\$rscore,"./${output}_row.csv",sep=",",col.names=F)
 EOS
 
 print FH $Rbat;
