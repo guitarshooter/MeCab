@@ -10,6 +10,10 @@ my $fileid=0;
 my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 my $pos_str = "";
 
+if(@ARGV == 0){
+  die "Input:POSデータ(複数可） Output:全InputのTermExtractによる解析結果(標準出力)\n";
+}
+
 while(@ARGV){
   my $txt = "";
   my $file = shift @ARGV;
@@ -29,7 +33,6 @@ foreach (@noun_list) {
    # 結果表示
 #   printf "%-60s %16.2f\n", $_->[0], $_->[1];
    printf "%-s,%.2f\n",$_->[0],$_->[1];
-   
 #   print $_->[0], $_->[1];
 }
 

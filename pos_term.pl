@@ -10,6 +10,10 @@ my $fileid=0;
 my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 my $DELLSTR="DELLWORD"; #削除辞書区別フラグ
 
+if(@ARGV == 0){
+  die "Input:テキストデータ（複数可） Output:POSデータファイル、TermExtractファイル\n";
+}
+
 while(@ARGV){
   my $txt = "";
   my $pos_str = "";
@@ -50,7 +54,7 @@ while(@ARGV){
     #print join("\t", $word, $categories[0], $kana, $pronunce), "\n";
     
     #print OUT join("\t",$word,$feature),"\n";
-    $pos_str .= join(",",$word,$feature)."\n";
+    $pos_str .= join("\t",$word,$feature)."\n";
     $pos_str_term .= join("\t",$word,$feature)."\n";
     $node = $node->{next};
   }
