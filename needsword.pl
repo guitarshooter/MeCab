@@ -24,17 +24,29 @@ while(@ARGV){
     pop(@pat_data);
   }
 
-  $needs_str = needsword_search(@pat_data);
+  $needs_str = needsword_search("名詞,形容動詞",@pat_data);
 
   if($needs_str){
     print $file.":".$needs_str,"\n";
   }else{
     #注目ワードが無かった場合
+    $needs_str = needsword_search("動詞,自立",@pat_data);
+    if($needs_str){
+      print $file.":".$needs_str."（注目ワード：動詞)"."\n";
+    }else{
+      $needs_str = needsword_search("形容詞,自立",@pat_data);
+      if($needs_str){
+        print $file.":".$needs_str."（注目ワード：形容詞)"."\n";
+      }else{
+        print $file.":"."Notice:Keyword is not found...\n";
+      }
+    }
   }
 
 }
 
 sub needsword_search{
+  my $keyword = shift;
   my @data = @_;
   my $needs_str = "";
   $flg = 0;
@@ -53,7 +65,7 @@ sub needsword_search{
         #次が助詞や名詞以外なら終了
         if($data[$i-1] !~ /助詞,連体化|名詞,一般/){
           #前の単語が形容詞or接頭語ならそれも追加して終了
-          if($data[$i-1] =~ /形容詞|接頭語/){
+          if($data[$i-1] =~ /形容詞|接頭詞/){
             @line = split(/,/,$data[$i-1]);
             $needs_str = $line[0].$needs_str;
           }
@@ -62,9 +74,9 @@ sub needsword_search{
       }
     }
     #注目ワード設定部
-    if($flg != 1){
-      #形容動詞があればフラグを立てる
-      if($data[$i] =~ /形容動詞/){
+    if($flg != 1 && $i>=3){
+      #指定したキーワード(引数)があればフラグを立てる
+      if($data[$i] =~ /$keyword/ && $data[$i] !~ /できる/ && $data[$i] !~ /サ変・スル/ ){
         $flg = 1;
         @line = split(/,/,$data[$i]);
         $needs_str = $line[0].$needs_str;

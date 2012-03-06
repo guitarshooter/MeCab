@@ -1,14 +1,17 @@
 #!/usr/bin/perl
 #ダウンロードしたCSVから、特許番号と発明の効果を抜き出す
 use Encode;
+use File::Basename;
 use Data::Dumper;
 use Text::CSV_XS;
+my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 
 while(@ARGV){
   $file = shift;
   my $csv = Text::CSV_XS->new({binary => 1});
   open my $IN,"<",$file;
-  open(CSV,">text.csv");
+  my ($filename,$filepath,$filesuffix) = fileparse($file,$regex_suffix); 
+  open(CSV,">最後の一文_".$filename.".csv");
   while ( my $row = $csv->getline($IN) ){ 
     map( { Encode::from_to($_,"cp932","utf8") } @$row);
     if($$row[1] eq "公開番号"){
