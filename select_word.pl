@@ -13,9 +13,19 @@ my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 #頻度とFH値のファイル名
 my @arrt_file = ("arrt_words_cnt.txt","arrt_words_tf.txt");
 
-my $MAXIDF;
-my $MINIDF = 2;  #使用する単語のIDF最小値。
-my $MINCNT = 30; #使用する単語の最小頻度。
+if($#ARGV != 2){
+  print "Usage:$0 maxIDF minIDF minCount\n";
+  print "maxIDF(per):最大IDF値を決定する出現ドキュメント数\n";
+  print "minIDF(per):最小IDF値を決定する出現ドキュメント数\n";
+  print "minCount:使用する単語の最小出現頻度\n";
+  die "(input:arrt_words_cnt.txt,arrt_words_tf.txt)\n";
+}
+
+my $maxcnt = shift @ARGV; #使用する単語の最大IDF値を決定。全ドキュメントのどの程度の
+#my $MINIDF = 2;  #使用する単語のIDF最小値。
+#my $MINCNT = 30; #使用する単語の最小頻度。
+my $mincnt = shift @ARGV;  #使用する単語のIDF最小値。
+my $MINCNT = shift @ARGV; #使用する単語の最小頻度。
 
 while(@arrt_file){
   my $file = shift @arrt_file;
@@ -37,7 +47,8 @@ while(@arrt_file){
 
   my $alldoccnt = @header;
   $alldoccnt = $alldoccnt - 2; #ドキュメント数＝カラム数-2（全頻度,IDF値）
-  $MAXIDF = 1+log($alldoccnt*0.8)/log(2); #使用する単語のIDF最大値。
+  my $MINIDF = 1+log($alldoccnt/$mincnt)/log(2); #使用する単語のIDF最小値。
+  my $MAXIDF = 1+log($alldoccnt/$maxcnt)/log(2); #使用する単語のIDF最大値。
 
   my $i;
   for($i=0;$i<$linecnt;$i++){
