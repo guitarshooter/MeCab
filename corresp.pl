@@ -6,8 +6,8 @@ use Encode;
 
 my $cnt = @ARGV;
 
-if($cnt < 1 && $cnt > 2){
-  die("Usage:$0 inputfile [outputfile]"); #出力ファイル名は省略可能
+if($cnt < 1 || $cnt > 2){
+  die("Usage:$0 inputfile [outputfile],\n"); #出力ファイル名は省略可能
 }
 
 my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
