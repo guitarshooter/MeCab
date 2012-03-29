@@ -4,15 +4,22 @@ use Data::Dumper;
 use File::Basename;
 use TermExtract::MeCab;
 use Unicode::Japanese;
+use Getopt::Std;
 
 my %filetitle;
 my $fileid=0;
 my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 my $DELLSTR="DELLWORD"; #削除辞書区別フラグ
-my $OPTION="-d /usr/local/lib/mecab/dic/naist-pat/";
+my $OPTION="";
+
+getopt "d";
+print $opt_d,"\n";
+if($opt_d ne ""){
+  $OPTION="-d /usr/local/lib/mecab/dic/".$opt_d."/";
+}
 
 if(@ARGV == 0){
-  die "Input:テキストデータ（複数可） Output:POSデータファイル、TermExtractファイル\n";
+  print "$0 (-d DictionaryName) Input:テキストデータ（複数可） Output:POSデータファイル、TermExtractファイル\n";
 }
 
 while(@ARGV){
@@ -33,7 +40,7 @@ while(@ARGV){
   $filetitle{$fileid}=$filename;
   print CNT ","."$filename";
   print TF ","."$filename";
-  $mecab = MeCab::Tagger->new($OPTION);
+  $mecab = MeCab::Tagger->new("$OPTION");
   $data = new TermExtract::MeCab;
   
   $node = $mecab->parseToNode($txt);
