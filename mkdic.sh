@@ -1,6 +1,6 @@
 #!/bin/sh
 BINDIR=/Users/10005239/Bin/MeCab
-TERMDIR=/Users/10005239/Bin/MeCab/Dictest/TermDic
+TERMDIR=/Users/10005239/Bin/MeCab/Dic
 DICDIR=/usr/local/lib/mecab/dic/naist-pat/
 USERDIC=userdic.dic
 TERMTXT=maketerm.txt

@@ -12,10 +12,14 @@ my $regex_suffix = qw/\.[^\.]+$/; #拡張子をのぞくための正規表現
 my $DELLSTR="DELLWORD"; #削除辞書区別フラグ
 my $OPTION="";
 
-getopt "d";
+getopt "du";
 print $opt_d,"\n";
-if($opt_d ne ""){
-  $OPTION="-d /usr/local/lib/mecab/dic/".$opt_d."/";
+print $opt_u,"\n";
+if($opt_d){
+  $OPTION .= " -d /usr/local/lib/mecab/dic/".$opt_d."/";
+}
+if($opt_u){
+  $OPTION .= " -u ".$opt_u;
 }
 
 if(@ARGV == 0){
